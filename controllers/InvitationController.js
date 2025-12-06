@@ -20,7 +20,7 @@ transporter.verify(function (error, success) {
   }
 });
 
-// TEST EMAIL - Debugging ke liye
+// TEST EMAIL
 export const testEmail = async (req, res) => {
   try {
     console.log('📧 Sending test email...');
@@ -28,8 +28,8 @@ export const testEmail = async (req, res) => {
     
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_USER, // Apne hi email pe test
-      subject: 'Test Email - Monday Clone',
+      to: process.env.EMAIL_USER,
+      subject: 'Test Email - Futures Platform',
       html: '<h1>✅ Email Working!</h1><p>Your email configuration is correct.</p>'
     };
 
@@ -108,47 +108,256 @@ export const sendInvitations = async (req, res) => {
         await newInvitation.save();
         console.log(`✅ Saved to database`);
 
-        // Prepare email
-        const invitationUrl = `https://${accountName}.monday.com/accept-invitation?token=${invitationToken}`;
+        // Dynamic invitation URL with account name
+        const invitationUrl = `https://monday-frontend-one.vercel.app/${accountName}?token=${invitationToken}`;
         
         const mailOptions = {
           from: process.env.EMAIL_USER,
           to: email,
-          subject: `${inviterName} invited you to monday.com`,
+          subject: `${inviterName} invited you to join ${accountName} on Futures`,
           html: `
             <!DOCTYPE html>
-            <html>
+            <html lang="en">
             <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Team Invitation</title>
               <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #0073ea; color: white; padding: 20px; text-align: center; }
-                .content { padding: 30px; background: #f9f9f9; }
-                .button { display: inline-block; padding: 12px 30px; background: #0073ea; color: white; text-decoration: none; border-radius: 4px; margin: 20px 0; }
-                .info { background: white; padding: 15px; border-left: 4px solid #0073ea; margin: 20px 0; }
-                .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+                * {
+                  margin: 0;
+                  padding: 0;
+                  box-sizing: border-box;
+                }
+                body {
+                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                  line-height: 1.6;
+                  color: #1a1a1a;
+                  background-color: #f5f5f5;
+                  padding: 20px;
+                }
+                .email-container {
+                  max-width: 600px;
+                  margin: 0 auto;
+                  background-color: #ffffff;
+                  border-radius: 12px;
+                  overflow: hidden;
+                  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                }
+                .header {
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  padding: 40px 30px;
+                  text-align: center;
+                }
+                .logo {
+                  font-size: 32px;
+                  font-weight: 700;
+                  color: #ffffff;
+                  letter-spacing: -0.5px;
+                  margin-bottom: 10px;
+                }
+                .tagline {
+                  font-size: 14px;
+                  color: rgba(255, 255, 255, 0.9);
+                  font-weight: 300;
+                }
+                .content {
+                  padding: 40px 30px;
+                }
+                .greeting {
+                  font-size: 24px;
+                  font-weight: 600;
+                  color: #1a1a1a;
+                  margin-bottom: 20px;
+                }
+                .message {
+                  font-size: 16px;
+                  color: #4a5568;
+                  line-height: 1.8;
+                  margin-bottom: 30px;
+                }
+                .highlight {
+                  color: #667eea;
+                  font-weight: 600;
+                }
+                .cta-button {
+                  display: inline-block;
+                  padding: 16px 40px;
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  color: #ffffff;
+                  text-decoration: none;
+                  border-radius: 8px;
+                  font-weight: 600;
+                  font-size: 16px;
+                  transition: transform 0.2s ease, box-shadow 0.2s ease;
+                  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                  text-align: center;
+                  margin: 20px 0;
+                }
+                .cta-button:hover {
+                  transform: translateY(-2px);
+                  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+                }
+                .info-box {
+                  background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
+                  border-left: 4px solid #667eea;
+                  padding: 20px;
+                  border-radius: 8px;
+                  margin: 30px 0;
+                }
+                .info-item {
+                  margin-bottom: 12px;
+                  font-size: 14px;
+                }
+                .info-label {
+                  color: #718096;
+                  font-weight: 500;
+                  display: block;
+                  margin-bottom: 4px;
+                }
+                .info-value {
+                  color: #2d3748;
+                  font-weight: 600;
+                  font-size: 15px;
+                }
+                .features {
+                  margin: 30px 0;
+                }
+                .feature-item {
+                  display: flex;
+                  align-items: start;
+                  margin-bottom: 16px;
+                }
+                .feature-icon {
+                  width: 24px;
+                  height: 24px;
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-size: 14px;
+                  margin-right: 12px;
+                  flex-shrink: 0;
+                }
+                .feature-text {
+                  color: #4a5568;
+                  font-size: 14px;
+                  line-height: 1.6;
+                }
+                .footer {
+                  background-color: #f7fafc;
+                  padding: 30px;
+                  text-align: center;
+                  border-top: 1px solid #e2e8f0;
+                }
+                .footer-text {
+                  color: #718096;
+                  font-size: 13px;
+                  line-height: 1.6;
+                  margin-bottom: 15px;
+                }
+                .footer-link {
+                  color: #667eea;
+                  text-decoration: none;
+                  font-weight: 500;
+                }
+                .footer-link:hover {
+                  text-decoration: underline;
+                }
+                .divider {
+                  height: 1px;
+                  background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+                  margin: 30px 0;
+                }
+                @media only screen and (max-width: 600px) {
+                  .content {
+                    padding: 30px 20px;
+                  }
+                  .header {
+                    padding: 30px 20px;
+                  }
+                  .greeting {
+                    font-size: 20px;
+                  }
+                  .message {
+                    font-size: 15px;
+                  }
+                }
               </style>
             </head>
             <body>
-              <div class="container">
+              <div class="email-container">
                 <div class="header">
-                  <h1>monday.com</h1>
+                  <div class="logo">Futures</div>
+                  <div class="tagline">Work Smarter, Together</div>
                 </div>
+                
                 <div class="content">
-                  <h2>${inviterName} invited you to monday.com</h2>
-                  <p><strong>Work Management</strong></p>
-                  <p>monday.com is the Work OS that powers teams to run projects and workflows with confidence.</p>
+                  <div class="greeting">You're Invited! 🎉</div>
                   
-                  <a href="${invitationUrl}" class="button">Accept Invitation</a>
-                  
-                  <div class="info">
-                    <p><strong>Your Account's URL:</strong><br>${accountName}.monday.com</p>
-                    <p><strong>Your Login Email:</strong><br>${email}</p>
+                  <div class="message">
+                    <strong>${inviterName}</strong> has invited you to join <span class="highlight">${accountName}</span> workspace on Futures. 
+                    Start collaborating with your team and bring your projects to life!
+                  </div>
+
+                  <div style="text-align: center;">
+                    <a href="${invitationUrl}" class="cta-button">Accept Invitation →</a>
+                  </div>
+
+                  <div class="info-box">
+                    <div class="info-item">
+                      <span class="info-label">Workspace</span>
+                      <span class="info-value">${accountName}.futures.com</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="info-label">Your Login Email</span>
+                      <span class="info-value">${email}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="info-label">Role</span>
+                      <span class="info-value">${role}</span>
+                    </div>
+                  </div>
+
+                  <div class="divider"></div>
+
+                  <div class="features">
+                    <div class="feature-item">
+                      <div class="feature-icon">✓</div>
+                      <div class="feature-text">
+                        <strong>Collaborate in Real-Time</strong><br>
+                        Work together seamlessly with your team members
+                      </div>
+                    </div>
+                    <div class="feature-item">
+                      <div class="feature-icon">✓</div>
+                      <div class="feature-text">
+                        <strong>Powerful Project Management</strong><br>
+                        Track progress, assign tasks, and hit deadlines
+                      </div>
+                    </div>
+                    <div class="feature-item">
+                      <div class="feature-icon">✓</div>
+                      <div class="feature-text">
+                        <strong>Stay Organized</strong><br>
+                        Keep all your work in one centralized platform
+                      </div>
+                    </div>
                   </div>
                 </div>
+
                 <div class="footer">
-                  <p>Made with ❤️ by monday.com</p>
-                  <p><a href="#">Unsubscribe</a> from any communication about this invitation</p>
+                  <div class="footer-text">
+                    This invitation was sent by ${inviterName} (${inviterEmail})
+                  </div>
+                  <div class="footer-text">
+                    <a href="#" class="footer-link">Need help?</a> • 
+                    <a href="#" class="footer-link">Contact support</a>
+                  </div>
+                  <div class="footer-text" style="margin-top: 20px;">
+                    © 2024 Futures. All rights reserved.
+                  </div>
                 </div>
               </div>
             </body>
@@ -156,7 +365,7 @@ export const sendInvitations = async (req, res) => {
           `
         };
 
-        console.log(`📧 Sending email...`);
+        console.log(`📧 Sending email to ${email}...`);
         const info = await transporter.sendMail(mailOptions);
         console.log(`✅ Email sent! Message ID: ${info.messageId}`);
         
@@ -215,9 +424,12 @@ export const acceptInvitation = async (req, res) => {
 
     console.log('✅ Invitation accepted');
 
+    // Return account details for redirect
     res.status(200).json({
       message: 'Invitation accepted successfully',
-      invitation
+      invitation,
+      redirectUrl: 'https://monday-frontend-one.vercel.app/login',
+      accountName: invitation.accountName
     });
 
   } catch (error) {
