@@ -1,8 +1,9 @@
 import express from "express";
-import { saveAccount } from "../controllers/SignUpAccountController.js";
+import { saveAccount, getAccount } from "../controllers/SignUpAccountController.js"; // ADD getAccount
 
-const router = express.Router()
+const router = express.Router();
 
-router.post("/save-account", saveAccount)
+router.post("/save-account", saveAccount);
+router.post("/get-account", getAccount); // ADD THIS LINE
 
 export default router;

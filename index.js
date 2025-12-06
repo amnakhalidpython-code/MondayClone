@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import SignUpemailRoutes from './routes/SignUpemailRoutes.js';
 import accountRoutes from "./routes/SignUpAccountRoutes.js";
+import invitationRoutes from './routes/InvitationRoutes.js';
 
 
 dotenv.config();
@@ -20,6 +21,8 @@ app.use(express.json());
 // Routes
 app.use('/api/users',SignUpemailRoutes);
 app.use("/api/account", accountRoutes);
+app.use('/api/invitations', invitationRoutes);
+
 
 
 
