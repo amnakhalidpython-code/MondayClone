@@ -108,8 +108,8 @@ export const sendInvitations = async (req, res) => {
         await newInvitation.save();
         console.log(`✅ Saved to database`);
 
-        // Dynamic invitation URL with account name
-        const invitationUrl = `https://monday-frontend-one.vercel.app/${accountName}?token=${invitationToken}`;
+        // Dynamic invitation URL
+        const invitationUrl = `https://monday-frontend-one.vercel.app/one?ref=invitation&token=${invitationToken}&account=${accountName}`;
         
         const mailOptions = {
           from: process.env.EMAIL_USER,
@@ -122,244 +122,153 @@ export const sendInvitations = async (req, res) => {
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <title>Team Invitation</title>
-              <style>
-                * {
-                  margin: 0;
-                  padding: 0;
-                  box-sizing: border-box;
-                }
-                body {
-                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-                  line-height: 1.6;
-                  color: #1a1a1a;
-                  background-color: #f5f5f5;
-                  padding: 20px;
-                }
-                .email-container {
-                  max-width: 600px;
-                  margin: 0 auto;
-                  background-color: #ffffff;
-                  border-radius: 12px;
-                  overflow: hidden;
-                  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                }
-                .header {
-                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                  padding: 40px 30px;
-                  text-align: center;
-                }
-                .logo {
-                  font-size: 32px;
-                  font-weight: 700;
-                  color: #ffffff;
-                  letter-spacing: -0.5px;
-                  margin-bottom: 10px;
-                }
-                .tagline {
-                  font-size: 14px;
-                  color: rgba(255, 255, 255, 0.9);
-                  font-weight: 300;
-                }
-                .content {
-                  padding: 40px 30px;
-                }
-                .greeting {
-                  font-size: 24px;
-                  font-weight: 600;
-                  color: #1a1a1a;
-                  margin-bottom: 20px;
-                }
-                .message {
-                  font-size: 16px;
-                  color: #4a5568;
-                  line-height: 1.8;
-                  margin-bottom: 30px;
-                }
-                .highlight {
-                  color: #667eea;
-                  font-weight: 600;
-                }
-                .cta-button {
-                  display: inline-block;
-                  padding: 16px 40px;
-                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                  color: #ffffff;
-                  text-decoration: none;
-                  border-radius: 8px;
-                  font-weight: 600;
-                  font-size: 16px;
-                  transition: transform 0.2s ease, box-shadow 0.2s ease;
-                  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-                  text-align: center;
-                  margin: 20px 0;
-                }
-                .cta-button:hover {
-                  transform: translateY(-2px);
-                  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-                }
-                .info-box {
-                  background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
-                  border-left: 4px solid #667eea;
-                  padding: 20px;
-                  border-radius: 8px;
-                  margin: 30px 0;
-                }
-                .info-item {
-                  margin-bottom: 12px;
-                  font-size: 14px;
-                }
-                .info-label {
-                  color: #718096;
-                  font-weight: 500;
-                  display: block;
-                  margin-bottom: 4px;
-                }
-                .info-value {
-                  color: #2d3748;
-                  font-weight: 600;
-                  font-size: 15px;
-                }
-                .features {
-                  margin: 30px 0;
-                }
-                .feature-item {
-                  display: flex;
-                  align-items: start;
-                  margin-bottom: 16px;
-                }
-                .feature-icon {
-                  width: 24px;
-                  height: 24px;
-                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                  border-radius: 50%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  color: white;
-                  font-size: 14px;
-                  margin-right: 12px;
-                  flex-shrink: 0;
-                }
-                .feature-text {
-                  color: #4a5568;
-                  font-size: 14px;
-                  line-height: 1.6;
-                }
-                .footer {
-                  background-color: #f7fafc;
-                  padding: 30px;
-                  text-align: center;
-                  border-top: 1px solid #e2e8f0;
-                }
-                .footer-text {
-                  color: #718096;
-                  font-size: 13px;
-                  line-height: 1.6;
-                  margin-bottom: 15px;
-                }
-                .footer-link {
-                  color: #667eea;
-                  text-decoration: none;
-                  font-weight: 500;
-                }
-                .footer-link:hover {
-                  text-decoration: underline;
-                }
-                .divider {
-                  height: 1px;
-                  background: linear-gradient(to right, transparent, #e2e8f0, transparent);
-                  margin: 30px 0;
-                }
-                @media only screen and (max-width: 600px) {
-                  .content {
-                    padding: 30px 20px;
-                  }
-                  .header {
-                    padding: 30px 20px;
-                  }
-                  .greeting {
-                    font-size: 20px;
-                  }
-                  .message {
-                    font-size: 15px;
-                  }
-                }
-              </style>
             </head>
-            <body>
-              <div class="email-container">
-                <div class="header">
-                  <div class="logo">Futures</div>
-                  <div class="tagline">Work Smarter, Together</div>
-                </div>
-                
-                <div class="content">
-                  <div class="greeting">You're Invited! 🎉</div>
-                  
-                  <div class="message">
-                    <strong>${inviterName}</strong> has invited you to join <span class="highlight">${accountName}</span> workspace on Futures. 
-                    Start collaborating with your team and bring your projects to life!
-                  </div>
+            <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f7fa; line-height: 1.6;">
+              <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f5f7fa;">
+                <tr>
+                  <td style="padding: 40px 20px;">
+                    <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07); overflow: hidden;">
+                      
+                      <!-- Header with gradient -->
+                      <tr>
+                        <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 48px 40px; text-align: center;">
+                          <h1 style="margin: 0 0 8px 0; font-size: 36px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">Futures</h1>
+                          <p style="margin: 0; font-size: 15px; color: rgba(255, 255, 255, 0.9); font-weight: 300;">Work Smarter, Together</p>
+                        </td>
+                      </tr>
 
-                  <div style="text-align: center;">
-                    <a href="${invitationUrl}" class="cta-button">Accept Invitation →</a>
-                  </div>
+                      <!-- Main content -->
+                      <tr>
+                        <td style="padding: 48px 40px;">
+                          <!-- Greeting -->
+                          <h2 style="margin: 0 0 24px 0; font-size: 28px; font-weight: 600; color: #1a202c;">You're Invited! 🎉</h2>
+                          
+                          <!-- Message -->
+                          <p style="margin: 0 0 24px 0; font-size: 16px; color: #4a5568; line-height: 1.8;">
+                            <strong style="color: #2d3748;">${inviterName}</strong> has invited you to join 
+                            <strong style="color: #667eea;">${accountName}</strong> workspace on Futures. 
+                            Start collaborating with your team and bring your projects to life!
+                          </p>
 
-                  <div class="info-box">
-                    <div class="info-item">
-                      <span class="info-label">Workspace</span>
-                      <span class="info-value">${accountName}.futures.com</span>
-                    </div>
-                    <div class="info-item">
-                      <span class="info-label">Your Login Email</span>
-                      <span class="info-value">${email}</span>
-                    </div>
-                    <div class="info-item">
-                      <span class="info-label">Role</span>
-                      <span class="info-value">${role}</span>
-                    </div>
-                  </div>
+                          <!-- CTA Button -->
+                          <table role="presentation" style="margin: 32px 0;">
+                            <tr>
+                              <td style="text-align: center;">
+                                <a href="${invitationUrl}" style="display: inline-block; padding: 16px 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); transition: transform 0.2s;">
+                                  Accept Invitation →
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
 
-                  <div class="divider"></div>
+                          <!-- Info Box -->
+                          <table role="presentation" style="width: 100%; background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%); border-left: 4px solid #667eea; border-radius: 8px; margin: 32px 0;">
+                            <tr>
+                              <td style="padding: 24px;">
+                                <table role="presentation" style="width: 100%;">
+                                  <tr>
+                                    <td style="padding-bottom: 12px;">
+                                      <p style="margin: 0 0 4px 0; font-size: 13px; color: #718096; font-weight: 500;">Workspace</p>
+                                      <p style="margin: 0; font-size: 15px; color: #2d3748; font-weight: 600;">${accountName}.futures.com</p>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td style="padding-bottom: 12px;">
+                                      <p style="margin: 0 0 4px 0; font-size: 13px; color: #718096; font-weight: 500;">Your Login Email</p>
+                                      <p style="margin: 0; font-size: 15px; color: #2d3748; font-weight: 600;">${email}</p>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td>
+                                      <p style="margin: 0 0 4px 0; font-size: 13px; color: #718096; font-weight: 500;">Role</p>
+                                      <p style="margin: 0; font-size: 15px; color: #2d3748; font-weight: 600;">${role}</p>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
 
-                  <div class="features">
-                    <div class="feature-item">
-                      <div class="feature-icon">✓</div>
-                      <div class="feature-text">
-                        <strong>Collaborate in Real-Time</strong><br>
-                        Work together seamlessly with your team members
-                      </div>
-                    </div>
-                    <div class="feature-item">
-                      <div class="feature-icon">✓</div>
-                      <div class="feature-text">
-                        <strong>Powerful Project Management</strong><br>
-                        Track progress, assign tasks, and hit deadlines
-                      </div>
-                    </div>
-                    <div class="feature-item">
-                      <div class="feature-icon">✓</div>
-                      <div class="feature-text">
-                        <strong>Stay Organized</strong><br>
-                        Keep all your work in one centralized platform
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                          <!-- Divider -->
+                          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;">
 
-                <div class="footer">
-                  <div class="footer-text">
-                    This invitation was sent by ${inviterName} (${inviterEmail})
-                  </div>
-                  <div class="footer-text">
-                    <a href="#" class="footer-link">Need help?</a> • 
-                    <a href="#" class="footer-link">Contact support</a>
-                  </div>
-                  <div class="footer-text" style="margin-top: 20px;">
-                    © 2024 Futures. All rights reserved.
-                  </div>
-                </div>
-              </div>
+                          <!-- Features -->
+                          <table role="presentation" style="width: 100%;">
+                            <tr>
+                              <td style="padding: 8px 0;">
+                                <table role="presentation">
+                                  <tr>
+                                    <td style="vertical-align: top; padding-right: 12px;">
+                                      <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: bold;">✓</div>
+                                    </td>
+                                    <td style="vertical-align: top;">
+                                      <p style="margin: 0; font-size: 14px; color: #4a5568; line-height: 1.6;">
+                                        <strong style="color: #2d3748;">Collaborate in Real-Time</strong><br>
+                                        Work together seamlessly with your team members
+                                      </p>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style="padding: 8px 0;">
+                                <table role="presentation">
+                                  <tr>
+                                    <td style="vertical-align: top; padding-right: 12px;">
+                                      <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: bold;">✓</div>
+                                    </td>
+                                    <td style="vertical-align: top;">
+                                      <p style="margin: 0; font-size: 14px; color: #4a5568; line-height: 1.6;">
+                                        <strong style="color: #2d3748;">Powerful Project Management</strong><br>
+                                        Track progress, assign tasks, and hit deadlines
+                                      </p>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style="padding: 8px 0;">
+                                <table role="presentation">
+                                  <tr>
+                                    <td style="vertical-align: top; padding-right: 12px;">
+                                      <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: bold;">✓</div>
+                                    </td>
+                                    <td style="vertical-align: top;">
+                                      <p style="margin: 0; font-size: 14px; color: #4a5568; line-height: 1.6;">
+                                        <strong style="color: #2d3748;">Stay Organized</strong><br>
+                                        Keep all your work in one centralized platform
+                                      </p>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- Footer -->
+                      <tr>
+                        <td style="background-color: #f7fafc; padding: 32px 40px; border-top: 1px solid #e2e8f0; text-align: center;">
+                          <p style="margin: 0 0 12px 0; font-size: 13px; color: #718096; line-height: 1.6;">
+                            This invitation was sent by <strong>${inviterName}</strong> (${inviterEmail})
+                          </p>
+                          <p style="margin: 0 0 20px 0; font-size: 13px; color: #718096;">
+                            <a href="#" style="color: #667eea; text-decoration: none; font-weight: 500;">Need help?</a> • 
+                            <a href="#" style="color: #667eea; text-decoration: none; font-weight: 500;">Contact support</a>
+                          </p>
+                          <p style="margin: 0; font-size: 12px; color: #a0aec0;">
+                            © 2024 Futures. All rights reserved.
+                          </p>
+                        </td>
+                      </tr>
+
+                    </table>
+                  </td>
+                </tr>
+              </table>
             </body>
             </html>
           `
@@ -424,11 +333,10 @@ export const acceptInvitation = async (req, res) => {
 
     console.log('✅ Invitation accepted');
 
-    // Return account details for redirect
     res.status(200).json({
       message: 'Invitation accepted successfully',
       invitation,
-      redirectUrl: 'https://monday-frontend-one.vercel.app/login',
+      redirectUrl: 'https://monday-frontend-one.vercel.app/one',
       accountName: invitation.accountName
     });
 
