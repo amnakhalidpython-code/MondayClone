@@ -25,6 +25,12 @@
   },
   "engines": {
   "node": "24.x"
-}
+},
+  "build":
+ {
+     "scripts": {
+       "build": "vite build"
+     }
+   }
 
 }
