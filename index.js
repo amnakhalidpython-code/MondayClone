@@ -5,7 +5,7 @@ import connectDB from "./config/db.js";
 import SignUpemailRoutes from './routes/SignUpemailRoutes.js';
 import accountRoutes from "./routes/SignUpAccountRoutes.js";
 import invitationRoutes from './routes/InvitationRoutes.js';
-const boardRoutes = require('./routes/BoardRoute.js');
+import  boardRoutes from './routes/BoardRoute.js';
 
 
 dotenv.config();

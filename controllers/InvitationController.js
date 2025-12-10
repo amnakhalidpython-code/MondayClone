@@ -1,6 +1,14 @@
 import Invitation from '../models/Invitation.js';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+console.log('🔍 EMAIL CONFIG CHECK:');
+console.log('EMAIL_USER:', process.env.EMAIL_USER);
+console.log('EMAIL_PASSWORD:', process.env.EMAIL_PASSWORD ? `***${process.env.EMAIL_PASSWORD.substring(0,4)}...*** (${process.env.EMAIL_PASSWORD.length} chars)` : '❌ MISSING');
 
 // Email transporter setup
 const transporter = nodemailer.createTransport({
@@ -8,7 +16,9 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD
-  }
+  },
+  debug: true,
+  logger: true
 });
 
 // Verify transporter on startup
