@@ -2,57 +2,40 @@
 import mongoose from 'mongoose';
 
 const TemplateSchema = new mongoose.Schema({
-  templateId: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true
+  templateId: { 
+    type: String, 
+    required: true, 
+    unique: true 
   },
   
-  name: {
-    type: String,
-    required: true,
-    trim: true
+  name: { 
+    type: String, 
+    required: true 
   },
   
-  category: {
-    type: String,
-    required: true,
-    enum: ['Marketing', 'HR', 'Nonprofits', 'Sales & CRM', 'Project Management', 'Software Development'],
-    default: 'Nonprofits'
+  category: { 
+    type: String, 
+    required: true 
   },
   
-  description: {
-    type: String,
-    required: true
+  description: String,
+  thumbnail: String,
+  
+  creator: { 
+    type: String, 
+    default: 'monday.com' 
   },
   
-  thumbnail: {
-    type: String,
-    default: ''
-  },
+  downloads: String,
   
-  creator: {
-    type: String,
-    default: 'monday.com'
-  },
-  
-  downloads: {
-    type: String,
-    default: '0'
-  },
-  
-  // Integrations display ke liye
   integrations: [{
     name: String,
     icon: String
   }],
   
-  // Board structure jo create hogi
   boardStructure: {
-    name: { type: String, required: true },
+    name: String,
     
-    // Columns configuration (same as Board model)
     columns: {
       owner: { type: Boolean, default: true },
       status: { type: Boolean, default: true },
@@ -65,39 +48,45 @@ const TemplateSchema = new mongoose.Schema({
       files: { type: Boolean, default: false }
     },
     
-    // Pre-filled items (optional)
+    // ✅ VIEWS - Properly defined with explicit schema
+    views: {
+      type: [{
+        id: { type: String },
+        name: { type: String },
+        icon: { type: String },
+        type: { 
+          type: String,
+          enum: ['main', 'table', 'kanban', 'calendar', 'dashboard']
+        },
+        isDefault: { type: Boolean, default: false },
+        settings: { type: mongoose.Schema.Types.Mixed }
+      }],
+      default: []
+    },
+    
     sampleItems: [{
       title: String,
       group: String,
-      data: mongoose.Schema.Types.Mixed
+      data: mongoose.Schema.Types.Mixed,
+      createdAt: { type: Date, default: Date.now }
     }],
     
-    // Board settings
-    settings: {
-      backgroundColor: { type: String, default: '#ffffff' },
-      isPublic: { type: Boolean, default: false },
-      allowComments: { type: Boolean, default: true }
-    }
+    settings: mongoose.Schema.Types.Mixed
   },
   
-  // Analytics
-  usageCount: {
-    type: Number,
-    default: 0
+  usageCount: { 
+    type: Number, 
+    default: 0 
   },
   
-  isActive: {
-    type: Boolean,
-    default: true
+  isActive: { 
+    type: Boolean, 
+    default: true 
   }
-
+  
 }, {
   timestamps: true
 });
-
-// Index for fast searching
-TemplateSchema.index({ category: 1, isActive: 1 });
-TemplateSchema.index({ templateId: 1 });
 
 const Template = mongoose.model('Template', TemplateSchema);
 export default Template;

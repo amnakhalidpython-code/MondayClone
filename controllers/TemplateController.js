@@ -91,7 +91,7 @@ export const getTemplateById = async (req, res) => {
 };
 
 // ================================
-// ✅ Create Board from Template (MAIN FUNCTION)
+// ✅ Create Board from Template (MAIN FUNCTION) - WITH VIEWS
 // ================================
 export const createBoardFromTemplate = async (req, res) => {
   try {
@@ -111,12 +111,16 @@ export const createBoardFromTemplate = async (req, res) => {
       });
     }
 
-    // 2. Template structure se board banao
+    // 2. Template structure se board banao WITH VIEWS
     const boardData = {
       name: customBoardName || template.boardStructure.name,
       columns: template.boardStructure.columns,
       userId: userId || req.user?.id,
       items: template.boardStructure.sampleItems || [],
+      
+      // ✅ VIEWS COPY FROM TEMPLATE
+      views: template.boardStructure.views || [],
+      
       settings: template.boardStructure.settings || {},
       
       // Template metadata

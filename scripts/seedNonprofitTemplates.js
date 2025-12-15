@@ -31,6 +31,52 @@ const nonprofitTemplates = [
         budget: true,
         files: false
       },
+      
+      // ✅ VIEWS ADDED
+      views: [
+        {
+          id: 'donor-pipeline',
+          name: 'Donor Pipeline',
+          icon: 'board',
+          type: 'main',
+          isDefault: true,
+          settings: {
+            groupBy: 'status',
+            sortBy: 'budget'
+          }
+        },
+        {
+          id: 'getting-started',
+          name: 'Getting Started',
+          icon: 'document',
+          type: 'table',
+          isDefault: false,
+          settings: {
+            description: 'Welcome guide for donor management'
+          }
+        },
+        {
+          id: 'donor-list',
+          name: 'All Donors',
+          icon: 'board',
+          type: 'table',
+          isDefault: false,
+          settings: {
+            columns: ['name', 'contact', 'totalDonations', 'lastContact']
+          }
+        },
+        {
+          id: 'donor-dashboard',
+          name: 'Donor Dashboard',
+          icon: 'chart',
+          type: 'dashboard',
+          isDefault: false,
+          settings: {
+            widgets: ['totalDonors', 'monthlyRevenue', 'topDonors']
+          }
+        }
+      ],
+      
       sampleItems: [
         {
           title: 'John Anderson - $5,000 Donation',
@@ -62,10 +108,11 @@ const nonprofitTemplates = [
     creator: 'monday.com',
     integrations: [
       { name: 'Outlook', icon: 'https://dapulse-res.cloudinary.com/image/upload/monday_platform/template-store/integrations/outlook.png' },
-      { name: 'Gmail', icon: 'https://dapulse-res.cloudinary.com/image/upload/monday_platform/template-store/integrations/gmail.png' }
+      { name: 'Gmail', icon: 'https://dapulse-res.cloudinary.com/image/upload/monday_platform/template-store/integrations/gmail.png' },
+      { name: 'Google Drive', icon: 'https://dapulse-res.cloudinary.com/image/upload/monday_platform/template-store/integrations/google_drive.png' }
     ],
     boardStructure: {
-      name: 'Grants Management Board',
+      name: 'Grants Management',
       columns: {
         owner: true,
         status: true,
@@ -77,19 +124,83 @@ const nonprofitTemplates = [
         budget: true,
         files: true
       },
+      
+      // ✅ VIEWS CONFIGURATION
+      views: [
+        {
+          id: 'grants-pipeline',
+          name: 'Grants Pipeline',
+          icon: 'board',
+          type: 'main',
+          isDefault: true,
+          settings: {
+            groupBy: 'status',
+            sortBy: 'dueDate'
+          }
+        },
+        {
+          id: 'getting-started',
+          name: 'Getting Started',
+          icon: 'document',
+          type: 'table',
+          isDefault: false,
+          settings: {
+            description: 'Welcome guide and setup instructions'
+          }
+        },
+        {
+          id: 'grant-providers',
+          name: 'Grant Providers',
+          icon: 'board',
+          type: 'table',
+          isDefault: false,
+          settings: {
+            columns: ['providerName', 'contact', 'focus', 'deadline']
+          }
+        },
+        {
+          id: 'grants-dashboard',
+          name: 'Grants Dashboard',
+          icon: 'chart',
+          type: 'dashboard',
+          isDefault: false,
+          settings: {
+            widgets: ['totalGrants', 'upcomingDeadlines', 'statusChart']
+          }
+        }
+      ],
+      
       sampleItems: [
         {
           title: 'Community Development Grant 2025',
           group: 'Active Applications',
           data: {
-            owner: 'Team Lead',
+            owner: 'Grant Team',
             status: 'In Progress',
             dueDate: '2025-03-15',
             priority: 'High',
+            notes: 'Letter of intent submitted',
             budget: 50000
           }
+        },
+        {
+          title: 'Education Initiative Fund',
+          group: 'Research Phase',
+          data: {
+            owner: 'Research Team',
+            status: 'Planning',
+            dueDate: '2025-04-01',
+            priority: 'Medium',
+            notes: 'Gathering requirements',
+            budget: 25000
+          }
         }
-      ]
+      ],
+      settings: {
+        backgroundColor: '#ffffff',
+        isPublic: false,
+        allowComments: true
+      }
     }
   },
   
@@ -117,6 +228,52 @@ const nonprofitTemplates = [
         budget: true,
         files: false
       },
+      
+      // ✅ VIEWS ADDED
+      views: [
+        {
+          id: 'campaign-pipeline',
+          name: 'Campaign Pipeline',
+          icon: 'board',
+          type: 'main',
+          isDefault: true,
+          settings: {
+            groupBy: 'status',
+            sortBy: 'dueDate'
+          }
+        },
+        {
+          id: 'getting-started',
+          name: 'Getting Started',
+          icon: 'document',
+          type: 'table',
+          isDefault: false,
+          settings: {
+            description: 'Setup guide for fundraising campaigns'
+          }
+        },
+        {
+          id: 'calendar-view',
+          name: 'Campaign Calendar',
+          icon: 'calendar',
+          type: 'calendar',
+          isDefault: false,
+          settings: {
+            dateField: 'dueDate'
+          }
+        },
+        {
+          id: 'fundraising-dashboard',
+          name: 'Fundraising Dashboard',
+          icon: 'chart',
+          type: 'dashboard',
+          isDefault: false,
+          settings: {
+            widgets: ['totalRaised', 'activeCampaigns', 'goalProgress']
+          }
+        }
+      ],
+      
       sampleItems: [
         {
           title: 'Annual Gala 2025',
@@ -128,7 +285,12 @@ const nonprofitTemplates = [
             budget: 100000
           }
         }
-      ]
+      ],
+      settings: {
+        backgroundColor: '#ffffff',
+        isPublic: false,
+        allowComments: true
+      }
     }
   },
   
@@ -156,6 +318,52 @@ const nonprofitTemplates = [
         budget: false,
         files: false
       },
+      
+      // ✅ VIEWS ADDED
+      views: [
+        {
+          id: 'volunteer-list',
+          name: 'All Volunteers',
+          icon: 'board',
+          type: 'main',
+          isDefault: true,
+          settings: {
+            groupBy: 'status',
+            sortBy: 'name'
+          }
+        },
+        {
+          id: 'getting-started',
+          name: 'Getting Started',
+          icon: 'document',
+          type: 'table',
+          isDefault: false,
+          settings: {
+            description: 'Volunteer management setup guide'
+          }
+        },
+        {
+          id: 'volunteer-schedule',
+          name: 'Schedule',
+          icon: 'calendar',
+          type: 'calendar',
+          isDefault: false,
+          settings: {
+            dateField: 'dueDate'
+          }
+        },
+        {
+          id: 'volunteer-dashboard',
+          name: 'Volunteer Dashboard',
+          icon: 'chart',
+          type: 'dashboard',
+          isDefault: false,
+          settings: {
+            widgets: ['totalVolunteers', 'activeVolunteers', 'upcomingEvents']
+          }
+        }
+      ],
+      
       sampleItems: [
         {
           title: 'Emily Johnson - Event Planning',
@@ -167,14 +375,18 @@ const nonprofitTemplates = [
             notes: 'Excellent with children'
           }
         }
-      ]
+      ],
+      settings: {
+        backgroundColor: '#ffffff',
+        isPublic: false,
+        allowComments: true
+      }
     }
   }
 ];
 
 const seedTemplates = async () => {
   try {
-    // FIXED: Changed MONGODB_URI to MONGO_URI to match your .env file
     const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
     
     if (!mongoUri) {
