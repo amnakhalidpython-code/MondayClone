@@ -3,8 +3,7 @@ import mongoose from 'mongoose';
 
 const notificationSchema = new mongoose.Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'SignUpAccount', // Apki existing User model ka naam
+    type: String, // Changed to String to support email as userId
     required: true,
     index: true
   },

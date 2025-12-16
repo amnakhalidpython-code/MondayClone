@@ -8,6 +8,7 @@ router.get('/test-email', testEmail);
 
 // Send invitations
 router.post('/send', sendInvitations);
+router.post('/', sendInvitations); // Also support root path
 
 // Accept invitation
 router.get('/accept/:token', acceptInvitation);

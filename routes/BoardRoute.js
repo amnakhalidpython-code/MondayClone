@@ -5,10 +5,13 @@ const router = express.Router();
 import {
   createBoard,
   getBoardById,
+  getUserBoards,
   getAllBoards,
   updateBoard,
   deleteBoard,
   addBoardItem,
+  updateBoardItem,
+  deleteBoardItem,
   searchBoards
 } from '../controllers/BoardController.js'; // 👈 file name small letters recommended
 
@@ -32,6 +35,10 @@ router.route('/')
 router.route('/search')
   .get(searchBoards);
 
+// GET /api/boards/user/:userId → Get all boards for a user
+router.route('/user/:userId')
+  .get(getUserBoards);
+
 // GET /api/boards/:id → Get single board
 // PUT /api/boards/:id → Update board
 // DELETE /api/boards/:id → Delete board
@@ -43,6 +50,12 @@ router.route('/:id')
 // POST /api/boards/:id/items → Add item to board
 router.route('/:id/items')
   .post(addBoardItem);
+
+// PUT /api/boards/:id/items/:itemId → Update item
+// DELETE /api/boards/:id/items/:itemId → Delete item
+router.route('/:id/items/:itemId')
+  .put(updateBoardItem)
+  .delete(deleteBoardItem);
 
 // ================================
 // ✅ ES Module Export

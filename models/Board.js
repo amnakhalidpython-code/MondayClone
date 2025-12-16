@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 const BoardSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
+    required: [true, 'Board name is required'],
     trim: true
   },
 
@@ -20,19 +20,36 @@ const BoardSchema = new mongoose.Schema({
     files: { type: Boolean, default: false }
   },
 
+  // ✅ CRITICAL FIX: userId is String (Firebase UID)
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    type: String,
+    required: false
+  },
+
+  userEmail: {
+    type: String,
+    trim: true
   },
 
   items: [{
-    title: String,
-    group: String,
-    data: mongoose.Schema.Types.Mixed,
-    createdAt: { type: Date, default: Date.now }
+    title: {
+      type: String,
+      required: true
+    },
+    group: {
+      type: String,
+      default: 'default'
+    },
+    data: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {}
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
   }],
 
-  // ✅ NEW: Board Views/Sections
   views: [{
     id: String,
     name: String,
@@ -42,14 +59,26 @@ const BoardSchema = new mongoose.Schema({
       enum: ['main', 'table', 'kanban', 'calendar', 'dashboard'],
       default: 'main'
     },
-    isDefault: { type: Boolean, default: false },
+    isDefault: {
+      type: Boolean,
+      default: false
+    },
     settings: mongoose.Schema.Types.Mixed
   }],
 
   settings: {
-    backgroundColor: { type: String, default: '#ffffff' },
-    isPublic: { type: Boolean, default: false },
-    allowComments: { type: Boolean, default: true }
+    backgroundColor: {
+      type: String,
+      default: '#ffffff'
+    },
+    isPublic: {
+      type: Boolean,
+      default: false
+    },
+    allowComments: {
+      type: Boolean,
+      default: true
+    }
   },
 
   createdFrom: {
@@ -60,12 +89,24 @@ const BoardSchema = new mongoose.Schema({
 
   templateId: String,
 
-  isActive: { type: Boolean, default: true },
-  isDeleted: { type: Boolean, default: false }
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+
+  isDeleted: {
+    type: Boolean,
+    default: false
+  }
 
 }, {
   timestamps: true
 });
+
+// Indexes
+BoardSchema.index({ name: 'text' });
+BoardSchema.index({ userEmail: 1 });
+BoardSchema.index({ userId: 1 });
 
 const Board = mongoose.model('Board', BoardSchema);
 export default Board;

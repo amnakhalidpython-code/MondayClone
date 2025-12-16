@@ -45,11 +45,13 @@ app.get('/api/health', (req, res) => {
 
 
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('❌ ERROR:', err.stack);
+  console.error('Error details:', err);
   res.status(500).json({
     success: false,
     message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    error: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
   });
 });
 

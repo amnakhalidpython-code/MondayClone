@@ -3,7 +3,16 @@ import Notification from '../models/Notification.js';
 // Get all notifications for logged-in user
 const getNotifications = async (req, res) => {
   try {
-    const userId = req.user.id || req.user._id;
+    // Get userId from query params or user session
+    const userId = req.query.userId || req.user?.id || req.user?._id;
+    
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'userId is required'
+      });
+    }
+
     const limit = parseInt(req.query.limit) || 50;
     const skip = parseInt(req.query.skip) || 0;
 
