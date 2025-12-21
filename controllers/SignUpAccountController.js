@@ -1,28 +1,30 @@
+// controllers/SignUpAccountController.js
 import Account from "../models/SignUpAccount.js";
 
-// Save account (already exists)
+// Save account with category
 export const saveAccount = async (req, res) => {
   try {
-    const { email, fullName, accountName } = req.body; // ADD email here
+    const { email, fullName, accountName, category, role } = req.body; // 🆕 category aur role add kiya
 
     if (!fullName) {
       return res.status(400).json({ message: "Full name is required" });
     }
 
-    // Check if account already exists
     let account = await Account.findOne({ email });
     
     if (account) {
-      // Update existing account
       account.fullName = fullName;
       account.accountName = accountName;
+      account.category = category || 'work'; // 🆕 category save
+      account.role = role; // 🆕 role save
       await account.save();
     } else {
-      // Create new account
       account = await Account.create({
         email,
         fullName,
-        accountName
+        accountName,
+        category: category || 'work', // 🆕 default 'work'
+        role
       });
     }
 
@@ -39,10 +41,10 @@ export const saveAccount = async (req, res) => {
   }
 };
 
-// GET account (NEW FUNCTION - ADD THIS)
+// Get account
 export const getAccount = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email } = req.query; // 🆕 query se get karo
     
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
