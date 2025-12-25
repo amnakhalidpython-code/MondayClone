@@ -9,6 +9,8 @@ import  boardRoutes from './routes/BoardRoute.js';
 import InvitationRoutes from './routes/InvitationRoutes.js';
 import NotificationRoutes from './routes/notificationRoutes.js';
 import templateRoutes from './routes/TemplateRoutes.js';
+import donorRoutes from './routes/DonorRoutes.js';
+import columnRoutes from './routes/ColumnRoutes.js';
 
 
 dotenv.config();
@@ -30,6 +32,8 @@ app.use('/api/boards', boardRoutes);
 app.use('/api/invitations', InvitationRoutes);
 app.use('/api/notifications', NotificationRoutes);
 app.use('/api', templateRoutes);
+app.use('/api/donors', donorRoutes);
+app.use('/api/columns', columnRoutes);
 
 
 
