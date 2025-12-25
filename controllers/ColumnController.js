@@ -45,7 +45,7 @@ export const getColumnById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const column = await DynamicColumn.findById(id).lean();
+    const column = await DynamicColumn.findOne({ column_key: id }).lean();
     if (!column) {
       return res.status(404).json({
         success: false,
@@ -129,7 +129,7 @@ export const updateColumn = async (req, res) => {
     const validatedData = updateColumnSchema.parse(req.body);
 
     // Check if column exists
-    const column = await DynamicColumn.findById(id);
+    const column = await DynamicColumn.findOne({ column_key: id });
     if (!column) {
       return res.status(404).json({
         success: false,
@@ -138,8 +138,8 @@ export const updateColumn = async (req, res) => {
     }
 
     // Update column
-    const updatedColumn = await DynamicColumn.findByIdAndUpdate(
-      id,
+    const updatedColumn = await DynamicColumn.findOneAndUpdate(
+      { column_key: id },
       { $set: validatedData },
       { new: true, runValidators: true }
     );
@@ -168,7 +168,7 @@ export const deleteColumn = async (req, res) => {
     const { id } = req.params;
     const { permanent } = req.query;
 
-    const column = await DynamicColumn.findById(id);
+    const column = await DynamicColumn.findOne({ column_key: id });
     if (!column) {
       return res.status(404).json({
         success: false,
@@ -178,8 +178,8 @@ export const deleteColumn = async (req, res) => {
 
     if (permanent === 'true') {
       // Permanent delete: remove column and all associated values
-      await DynamicColumn.findByIdAndDelete(id);
-      await DonorColumnValue.deleteMany({ column_key: column.column_key });
+      await DynamicColumn.findOneAndDelete({ column_key: id });
+      await DonorColumnValue.deleteMany({ column_key: id });
       
       res.json({
         success: true,
@@ -243,6 +243,206 @@ export const reorderColumns = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to reorder columns',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * POST /columns/:id/duplicate
+ * Duplicate a column
+ */
+export const duplicateColumn = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const column = await DynamicColumn.findOne({ column_key: id });
+    if (!column) {
+      return res.status(404).json({
+        success: false,
+        message: 'Column not found'
+      });
+    }
+
+    // Create duplicate with new key
+    const duplicateData = {
+      column_key: `${column.column_key}_copy_${Date.now()}`,
+      title: `${column.title} (Copy)`,
+      type: column.type,
+      options: column.options,
+      width: column.width,
+      order: column.order + 1,
+      isRequired: column.isRequired
+    };
+
+    const duplicatedColumn = await DynamicColumn.create(duplicateData);
+
+    // Copy all values from original column to duplicated column
+    const originalValues = await DonorColumnValue.find({
+      column_key: column.column_key
+    }).lean();
+
+    if (originalValues.length > 0) {
+      const duplicatedValues = originalValues.map(val => ({
+        donor_id: val.donor_id,
+        column_key: duplicatedColumn.column_key,
+        value: val.value
+      }));
+      await DonorColumnValue.insertMany(duplicatedValues);
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Column duplicated successfully',
+      data: duplicatedColumn
+    });
+  } catch (error) {
+    console.error('Error in duplicateColumn:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to duplicate column',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * PATCH /columns/:id/change-type
+ * Change column type
+ */
+export const changeColumnType = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { newType, options } = req.body;
+
+    if (!newType) {
+      return res.status(400).json({
+        success: false,
+        message: 'newType is required'
+      });
+    }
+
+    const column = await DynamicColumn.findOne({ column_key: id });
+    if (!column) {
+      return res.status(404).json({
+        success: false,
+        message: 'Column not found'
+      });
+    }
+
+    // Update column type
+    column.type = newType;
+    if (options) {
+      column.options = options;
+    }
+    await column.save();
+
+    res.json({
+      success: true,
+      message: 'Column type changed successfully',
+      data: column
+    });
+  } catch (error) {
+    console.error('Error in changeColumnType:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to change column type',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * POST /columns/:id/autofill
+ * Autofill column with a value
+ */
+export const autofillColumn = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { value, donorIds } = req.body;
+
+    const column = await DynamicColumn.findOne({ column_key: id });
+    if (!column) {
+      return res.status(404).json({
+        success: false,
+        message: 'Column not found'
+      });
+    }
+
+    // If donorIds provided, autofill only those donors, otherwise all
+    const query = donorIds && donorIds.length > 0
+      ? { _id: { $in: donorIds } }
+      : {};
+
+    const donors = await import('../models/Donor.js').then(m => m.default.find(query).select('_id'));
+
+    const autofillPromises = donors.map(donor =>
+      DonorColumnValue.findOneAndUpdate(
+        { donor_id: donor._id, column_key: column.column_key },
+        { value },
+        { upsert: true, new: true }
+      )
+    );
+
+    await Promise.all(autofillPromises);
+
+    res.json({
+      success: true,
+      message: `Autofilled ${donors.length} donors`,
+      data: { count: donors.length, value }
+    });
+  } catch (error) {
+    console.error('Error in autofillColumn:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to autofill column',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * POST /columns/:id/add-to-right
+ * Add a new column to the right of current column
+ */
+export const addColumnToRight = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { column_key, title, type } = req.body;
+
+    const currentColumn = await DynamicColumn.findOne({ column_key: id });
+    if (!currentColumn) {
+      return res.status(404).json({
+        success: false,
+        message: 'Column not found'
+      });
+    }
+
+    // Shift all columns to the right
+    await DynamicColumn.updateMany(
+      { order: { $gt: currentColumn.order } },
+      { $inc: { order: 1 } }
+    );
+
+    // Create new column
+    const newColumn = await DynamicColumn.create({
+      column_key: column_key || `col_${Date.now()}`,
+      title: title || 'New Column',
+      type: type || 'text',
+      order: currentColumn.order + 1,
+      width: 150
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Column added successfully',
+      data: newColumn
+    });
+  } catch (error) {
+    console.error('Error in addColumnToRight:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to add column',
       error: error.message
     });
   }

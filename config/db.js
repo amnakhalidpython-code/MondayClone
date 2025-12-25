@@ -1,23 +1,16 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const connectDB = async () => {
+async function connectDB() {
   try {
-    // Agar already connected hai to return kar do
-    if (mongoose.connection.readyState >= 1) {
-      console.log('MongoDB already connected');
-      return;
-    }
-
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
+    await mongoose.connect(process.env.MONGO_URI, {
       serverSelectionTimeoutMS: 5000,
+      retryWrites: true,
     });
-
-    console.log(`MongoDB connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error('DB connection error:', error.message);
-    // Serverless mein process.exit() mat use karo
-    throw error; // Error throw karo instead
+    console.log("✅ MongoDB connected successfully");
+  } catch (err) {
+    console.error("❌ MongoDB connection error:", err.message);
+    process.exit(1);
   }
-};
+}
 
 export default connectDB;

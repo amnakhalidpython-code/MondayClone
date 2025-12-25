@@ -7,7 +7,8 @@
     "start": "nodemon index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "seed:templates": "node scripts/seedNonprofitTemplates.js"
+    "seed:templates": "node scripts/seedNonprofitTemplates.js",
+    "seed:donors": "node scripts/seedDonors.js"
   },
   "keywords": [],
   "author": "",

@@ -10,7 +10,11 @@ import {
   createColumn,
   updateColumn,
   deleteColumn,
-  reorderColumns
+  reorderColumns,
+  duplicateColumn,
+  changeColumnType,
+  autofillColumn,
+  addColumnToRight
 } from '../controllers/ColumnController.js';
 
 const router = express.Router();
@@ -24,5 +28,11 @@ router.delete('/:id', deleteColumn);
 
 // Column reordering
 router.patch('/reorder', reorderColumns);
+
+// Column operations
+router.post('/:id/duplicate', duplicateColumn);
+router.patch('/:id/change-type', changeColumnType);
+router.post('/:id/autofill', autofillColumn);
+router.post('/:id/add-to-right', addColumnToRight);
 
 export default router;

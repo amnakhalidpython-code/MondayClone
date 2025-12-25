@@ -14,9 +14,19 @@ import {
   uploadDonorFile,
   getDonorFiles
 } from '../controllers/DonorController.js';
+import {
+  advancedFilter,
+  groupByField,
+  sortDonors
+} from '../controllers/FilterController.js';
 import { upload, handleMulterError } from '../middleware/upload.js';
 
 const router = express.Router();
+
+// Advanced operations (must be before /:id routes)
+router.post('/filter', advancedFilter);
+router.post('/group-by', groupByField);
+router.post('/sort', sortDonors);
 
 // Donor CRUD routes
 router.get('/', getDonors);
