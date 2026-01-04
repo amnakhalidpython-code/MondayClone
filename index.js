@@ -2,23 +2,23 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
-import SignUpemailRoutes from './routes/SignUpemailRoutes.js';
-import accountRoutes from "./routes/SignUpAccountRoutes.js";
-import invitationRoutes from './routes/InvitationRoutes.js';
-import  boardRoutes from './routes/BoardRoute.js';
-import InvitationRoutes from './routes/InvitationRoutes.js';
-import NotificationRoutes from './routes/notificationRoutes.js';
-import templateRoutes from './routes/TemplateRoutes.js';
-import donorRoutes from './routes/DonorRoutes.js';
-import columnRoutes from './routes/ColumnRoutes.js';
 
+// Routes
+import SignUpemailRoutes from "./routes/SignUpemailRoutes.js";
+import accountRoutes from "./routes/SignUpAccountRoutes.js";
+import invitationRoutes from "./routes/InvitationRoutes.js";
+import boardRoutes from "./routes/BoardRoute.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import templateRoutes from "./routes/TemplateRoutes.js";
+import donorRoutes from "./routes/DonorRoutes.js";
+import columnRoutes from "./routes/ColumnRoutes.js";
 
 dotenv.config();
 connectDB();
 
 const app = express();
 
-// Middleware
+/* -------------------- CORS CONFIG -------------------- */
 const corsOptions = {
   origin: [
     "http://localhost:5173",
@@ -32,55 +32,44 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
+// MUST come before routes
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));  
+app.options("*", cors(corsOptions)); // ✅ Fixes preflight
 app.use(express.json());
 
- 
-
-
-// Routes
-app.use('/api/users',SignUpemailRoutes);
+/* -------------------- ROUTES -------------------- */
+app.use("/api/users", SignUpemailRoutes);
 app.use("/api/account", accountRoutes);
-app.use('/api/invitations', invitationRoutes);
-app.use('/api/boards', boardRoutes);
-app.use('/api/invitations', InvitationRoutes);
-app.use('/api/notifications', NotificationRoutes);
-app.use('/api', templateRoutes);
-app.use('/api/donors', donorRoutes);
-app.use('/api/columns', columnRoutes);
+app.use("/api/invitations", invitationRoutes);
+app.use("/api/boards", boardRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api", templateRoutes);
+app.use("/api/donors", donorRoutes);
+app.use("/api/columns", columnRoutes);
 
-
-
-
-
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    success: true, 
-    message: 'Server is running',
-    timestamp: new Date().toISOString()
+/* -------------------- HEALTH CHECK -------------------- */
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Server is running",
+    timestamp: new Date().toISOString(),
   });
 });
 
-
-app.use((err, req, res, next) => {
-  console.error('❌ ERROR:', err.stack);
-  console.error('Error details:', err);
-  res.status(500).json({
-    success: false,
-    message: 'Something went wrong!',
-    error: err.message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-  });
-});
-
-// Test route
+/* -------------------- ROOT -------------------- */
 app.get("/", (req, res) => {
   res.send("Backend API is running...");
 });
 
+/* -------------------- ERROR HANDLER -------------------- */
+app.use((err, req, res, next) => {
+  console.error("❌ ERROR:", err);
+  res.status(500).json({
+    success: false,
+    message: "Something went wrong!",
+    error: err.message,
+  });
+});
 
-
-// Start Server
-const PORT = process.env.PORT || 3002;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+/* -------------------- EXPORT FOR VERCEL -------------------- */
+export default app;
