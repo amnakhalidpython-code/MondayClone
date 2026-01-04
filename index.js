@@ -32,10 +32,9 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-// MUST come before routes
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // ✅ Fixes preflight
+app.use(cors(corsOptions)); // ✅ this is enough
 app.use(express.json());
+
 
 /* -------------------- ROUTES -------------------- */
 app.use("/api/users", SignUpemailRoutes);
