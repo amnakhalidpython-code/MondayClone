@@ -145,7 +145,7 @@ const seedDonors = async () => {
     console.log(`   - Donors: ${donors.length}`);
     console.log(`   - Columns: ${columns.length}`);
     console.log(`   - Custom Values: ${customValues.length}`);
-    console.log('\n🚀 You can now test the API at http://localhost:5000/api/donors');
+    console.log('\n🚀 You can now test the API at  https://wyatt-unobeyed-outrightly.ngrok-free.dev/api/donors');
 
     process.exit(0);
   } catch (error) {
