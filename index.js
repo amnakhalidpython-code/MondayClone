@@ -19,22 +19,33 @@ connectDB();
 const app = express();
 
 /* -------------------- CORS CONFIG -------------------- */
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://monday-clone-frontend.vercel.app",
+  "https://monday-frontend-one.vercel.app",
+  "https://monday-clone-nextjs-nu.vercel.app",
+];
+
 const corsOptions = {
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "https://monday-clone-frontend.vercel.app",
-    "https://monday-frontend-one.vercel.app",
-    "https://monday-clone-nextjs-nu.vercel.app",
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 200
 };
 
-app.use(cors(corsOptions)); // ✅ this is enough
-app.use(express.json());
+// ✅ Apply CORS - this handles preflight OPTIONS requests automatically
+app.use(cors(corsOptions));
 
+app.use(express.json());
 
 /* -------------------- ROUTES -------------------- */
 app.use("/api/users", SignUpemailRoutes);
