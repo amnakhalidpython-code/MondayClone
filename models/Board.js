@@ -7,17 +7,50 @@ const BoardSchema = new mongoose.Schema({
     required: [true, 'Board name is required'],
     trim: true
   },
+  type: {
+    type: String,
+    enum: ['board', 'dashboard'],
+    default: 'board'
+  },
 
   columns: {
-    owner: { type: Boolean, default: true },
-    status: { type: Boolean, default: true },
-    dueDate: { type: Boolean, default: true },
-    priority: { type: Boolean, default: false },
-    lastUpdated: { type: Boolean, default: false },
-    timeline: { type: Boolean, default: false },
-    notes: { type: Boolean, default: false },
-    budget: { type: Boolean, default: false },
-    files: { type: Boolean, default: false }
+    type: mongoose.Schema.Types.Mixed,
+    default: {
+      owner: true,
+      status: true,
+      dueDate: true,
+      priority: false,
+      lastUpdated: false,
+      timeline: false,
+      notes: false,
+      budget: false,
+      files: false,
+      email: false,
+      phone: false,
+      numbers: false,
+      checkbox: false,
+      dropdown: false,
+      formula: false
+    }
+  },
+  // ✅ NEW: Store custom column titles
+  columnTitles: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  },
+
+  // ✅ NEW: Store column order
+  columnOrder: {
+    type: [String],
+    default: []
+  },
+  // Store Widget selections for Dashboards
+  widgetSettings: {
+    tasksOverview: { type: Boolean, default: true },
+    tasksByStatus: { type: Boolean, default: true },
+    tasksByOwner: { type: Boolean, default: true },
+    overdueTasks: { type: Boolean, default: false },
+    tasksByDueDate: { type: Boolean, default: false }
   },
 
   // ✅ CRITICAL FIX: userId is String (Firebase UID)
@@ -40,7 +73,7 @@ const BoardSchema = new mongoose.Schema({
       type: String,
       default: 'default'
     },
-    data: {
+    column_values: {
       type: mongoose.Schema.Types.Mixed,
       default: {}
     },
@@ -83,7 +116,7 @@ const BoardSchema = new mongoose.Schema({
 
   createdFrom: {
     type: String,
-    enum: ['scratch', 'template'],
+    enum: ['scratch', 'template','onboarding'],
     default: 'scratch'
   },
 

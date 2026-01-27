@@ -6,116 +6,131 @@ import Board from '../models/Board.js';
 // ================================
 export const createBoard = async (req, res) => {
   try {
-    const { boardName, selectedColumns, tasks, userId, userEmail } = req.body;
+    const {
+      boardName,
+      selectedColumns,
+      selectedWidgets,
+      tasks,
+      userId,
+      userEmail
+    } = req.body;
 
-    if (!boardName || boardName.trim() === '') {
-      return res.status(400).json({
-        success: false,
-        message: 'Board name is required'
-      });
+    // 1. Process Tasks (Ensure 3 rows for demo if empty)
+    let rowsToCreate = tasks;
+    if (!rowsToCreate || rowsToCreate.length === 0 || (rowsToCreate.length === 1 && !rowsToCreate[0])) {
+      rowsToCreate = ['', '', ''];
     }
 
-    // ✅ Create default views
-    const defaultViews = [
-      {
-        id: 'main-table',
-        name: 'Main Table',
-        icon: 'board',
-        type: 'main',
-        isDefault: true
-      },
-      {
-        id: 'dashboard',
-        name: 'Dashboard and reporting',
-        icon: 'chart',
-        type: 'dashboard',
-        isDefault: false
-      }
-    ];
+    const boardItems = rowsToCreate.map((taskName, index) => {
+      const values = {};
+      const date = new Date();
+      date.setDate(date.getDate() + index);
 
-    // ✅ Create board items from tasks
-    const boardItems = (tasks || []).map((taskName, index) => ({
-      title: taskName,
-      group: 'default',
-      data: {
-        status: index === 0 ? 'Working on it' : index === 1 ? 'Done' : 'Stuck',
-        owner: null,
-        dueDate: null,
-        priority: null
-      }
-    }));
+      // --- Predefined Rich Data Logic ---
 
-    const board = await Board.create({
-      name: boardName.trim(),
-      columns: selectedColumns || {
-        owner: true,
-        status: true,
-        dueDate: true,
-        priority: false,
-        lastUpdated: false,
-        timeline: false,
-        notes: false,
-        budget: false,
-        files: false
-      },
-      views: defaultViews,
+      // 1. Status
+      if (selectedColumns?.status) {
+        values.status = index === 0 ? 'Working on it' : index === 1 ? 'Done' : 'Stuck';
+      }
+
+      // 2. Priority
+      if (selectedColumns?.priority) {
+        values.priority = index === 0 ? 'Low' : index === 1 ? 'High' : 'Medium';
+      }
+
+      // 3. Due Date
+      if (selectedColumns?.dueDate) {
+        values.dueDate = date.toISOString();
+      }
+
+      // 4. Budget
+      if (selectedColumns?.budget) {
+        values.budget = index === 0 ? 100 : index === 1 ? 1000 : 500;
+      }
+
+      // 5. Timeline (Object with start/end)
+      if (selectedColumns?.timeline) {
+        const start = new Date();
+        const end = new Date();
+        end.setDate(end.getDate() + 5 + index);
+        values.timeline = {
+          start: start.toISOString(),
+          end: end.toISOString(),
+          days: 5 + index
+        };
+      }
+
+      // 6. Notes
+      if (selectedColumns?.notes) values.notes = '';
+
+      // 7. Files (Array with mock file)
+      if (selectedColumns?.files) {
+        values.files = [{
+          name: 'Demo.pdf',
+          url: 'https://dapulse-res.cloudinary.com/image/upload/file.png'
+        }];
+      }
+
+      // 8. Last Updated
+      if (selectedColumns?.lastUpdated) values.lastUpdated = new Date().toISOString();
+
+      // 9. Owner (Object)
+      if (selectedColumns?.owner) {
+        values.owner = {
+          id: userId || 'guest',
+          name: userEmail || 'Guest',
+          // Default Monday-style avatar
+          avatar: "https://cdn1.monday.com/dapulse_default_photo.png"
+        };
+      }
+
+      return {
+        title: taskName && taskName.trim() !== '' ? taskName : `Task ${index + 1}`,
+        group: 'default',
+        column_values: values
+      };
+    });
+
+    const newBoard = await Board.create({
+      name: boardName || 'My first project',
+      type: 'board',
+      widgetSettings: selectedWidgets || {},
+      columns: selectedColumns || { owner: true, status: true, dueDate: true },
       items: boardItems,
-      userId: userId || null,
-      userEmail: userEmail || null,
-      createdFrom: 'scratch'
+      userId: userId || 'guest',
+      userEmail: userEmail || '',
+      createdFrom: 'onboarding'
     });
 
-    console.log('✅ Board created:', board._id);
-
-    res.status(201).json({
-      success: true,
-      message: 'Board created successfully',
-      boardId: board._id,
-      board
+    // Create Dashboard (Standard)
+    const newDashboard = await Board.create({
+      name: 'Dashboard and reporting',
+      type: 'dashboard',
+      widgetSettings: selectedWidgets || {},
+      userId: userId || 'guest',
+      userEmail: userEmail || '',
+      createdFrom: 'onboarding',
+      columnTitles: {},
+      columnOrder: []
     });
+
+    res.status(201).json({ success: true, board: newBoard, dashboard: newDashboard });
 
   } catch (error) {
     console.error('❌ Error creating board:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while creating board',
-      error: error.message
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
-
 // ================================
 // ✅ Get All Boards for a User
 // ================================
 export const getUserBoards = async (req, res) => {
   try {
     const { userId } = req.params;
-
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'User ID is required'
-      });
-    }
-
-    const boards = await Board.find({ 
-      userId: userId,
-      isDeleted: false 
-    }).sort({ createdAt: -1 });
-
-    res.status(200).json({
-      success: true,
-      boards,
-      count: boards.length
-    });
-
+    const boards = await Board.find({ userId: userId, isDeleted: false }).sort({ createdAt: -1 });
+    res.status(200).json({ success: true, boards, count: boards.length });
   } catch (error) {
-    console.error('❌ Error fetching user boards:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching boards',
-      error: error.message
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -124,38 +139,11 @@ export const getUserBoards = async (req, res) => {
 // ================================
 export const getBoardById = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { userId } = req.query;
-
-    const board = await Board.findById(id);
-
-    if (!board) {
-      return res.status(404).json({
-        success: false,
-        message: 'Board not found'
-      });
-    }
-
-    // Check if user has access to this board
-    if (userId && board.userId && board.userId !== userId) {
-      return res.status(403).json({
-        success: false,
-        message: 'You do not have access to this board'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      board
-    });
-
+    const board = await Board.findById(req.params.id);
+    if (!board) return res.status(404).json({ success: false, message: "Not found" });
+    res.status(200).json({ success: true, board });
   } catch (error) {
-    console.error('Error fetching board:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching board',
-      error: error.message
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -189,7 +177,7 @@ export const getAllBoards = async (req, res) => {
 // ================================
 export const updateBoard = async (req, res) => {
   try {
-    const { boardName, selectedColumns, settings } = req.body;
+    const { boardName, selectedColumns, settings,columnTitles ,columnOrder} = req.body;
 
     let board = await Board.findById(req.params.id);
 
@@ -201,7 +189,22 @@ export const updateBoard = async (req, res) => {
     }
 
     if (boardName) board.name = boardName.trim();
-    if (selectedColumns) board.columns = { ...board.columns, ...selectedColumns };
+
+    // Update columns dynamically
+    if (selectedColumns) {
+      board.columns = { ...board.columns, ...selectedColumns };
+      board.markModified('columns');
+    }
+    // Update Titles
+    if (columnTitles) {
+      board.columnTitles = { ...board.columnTitles, ...columnTitles };
+      board.markModified('columnTitles');
+    }
+
+    // Update Order
+    if (columnOrder) {
+      board.columnOrder = columnOrder;
+    }
     if (settings) board.settings = { ...board.settings, ...settings };
 
     await board.save();
@@ -260,7 +263,7 @@ export const deleteBoard = async (req, res) => {
 // ================================
 export const addBoardItem = async (req, res) => {
   try {
-    const { title, group, data } = req.body;
+    const { title, group, data,column_values } = req.body;
 
     const board = await Board.findById(req.params.id);
 
@@ -270,11 +273,13 @@ export const addBoardItem = async (req, res) => {
         message: 'Board not found'
       });
     }
-
+      const finalColumnValues = column_values || {};
     board.items.push({
       title,
       group: group || 'default',
-      data: data || {}
+      data: data || {},
+      column_values: finalColumnValues
+      
     });
 
     await board.save();
@@ -306,27 +311,34 @@ export const updateBoardItem = async (req, res) => {
     const board = await Board.findById(id);
 
     if (!board) {
-      return res.status(404).json({
-        success: false,
-        message: 'Board not found'
-      });
+      return res.status(404).json({ success: false, message: 'Board not found' });
     }
 
+    // Find the item
     const item = board.items.id(itemId);
 
     if (!item) {
-      return res.status(404).json({
-        success: false,
-        message: 'Item not found'
-      });
+      return res.status(404).json({ success: false, message: 'Item not found' });
     }
 
-    // Update item fields
+    // Update Basic Fields
     if (updates.title) item.title = updates.title;
     if (updates.group) item.group = updates.group;
-    if (updates.data) {
-      item.data = { ...item.data, ...updates.data };
+
+    // ✅ FIX: Update column_values properly
+    if (updates.column_values) {
+      // Initialize if undefined
+      if (!item.column_values) item.column_values = {};
+
+      // Merge new values
+      item.column_values = {
+        ...item.column_values,
+        ...updates.column_values
+      };
     }
+
+    // ✅ IMPORTANT: Tell Mongoose that 'items' array has changed
+    board.markModified('items');
 
     await board.save();
 
@@ -345,7 +357,6 @@ export const updateBoardItem = async (req, res) => {
     });
   }
 };
-
 // ================================
 // ✅ Delete Board Item
 // ================================

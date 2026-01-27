@@ -12,7 +12,7 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import templateRoutes from "./routes/TemplateRoutes.js";
 import donorRoutes from "./routes/DonorRoutes.js";
 import columnRoutes from "./routes/ColumnRoutes.js";
-
+import GrantRoutes from "./routes/GrantRoutes.js";
 dotenv.config();
 connectDB();
 
@@ -56,6 +56,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api", templateRoutes);
 app.use("/api/donors", donorRoutes);
 app.use("/api/columns", columnRoutes);
+app.use("/api/grants", GrantRoutes);
 
 /* -------------------- HEALTH CHECK -------------------- */
 app.get("/api/health", (req, res) => {
@@ -80,6 +81,15 @@ app.use((err, req, res, next) => {
     error: err.message,
   });
 });
+
+const PORT = process.env.PORT || 5000;
+
+// Only listen if the file is run directly (not imported by Vercel)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`✅ Server running on http://localhost:${PORT}`);
+  });
+}
 
 /* -------------------- EXPORT FOR VERCEL -------------------- */
 export default app;

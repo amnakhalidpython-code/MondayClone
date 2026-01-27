@@ -358,3 +358,13 @@ export const acceptInvitation = async (req, res) => {
     });
   }
 };
+export const getInviteDetails = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const invitation = await Invitation.findOne({ invitationToken: token });
+    if (!invitation) return res.status(404).json({ message: "Invalid token" });
+    res.status(200).json(invitation);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
