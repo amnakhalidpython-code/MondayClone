@@ -9,8 +9,7 @@ import mongoose from 'mongoose';
 const donorSchema = new mongoose.Schema({
   donor_name: {
     type: String,
-    required: [true, 'Donor name is required'],
-    trim: true
+    required: [true, 'Donor name is required']
   },
   email: {
     type: String,
