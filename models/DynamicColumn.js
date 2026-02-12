@@ -48,7 +48,8 @@ const dynamicColumnSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true
-});
+}
+);
 
 // Index for faster queries
 dynamicColumnSchema.index({ column_key: 1 });

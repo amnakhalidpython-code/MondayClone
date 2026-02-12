@@ -21,6 +21,7 @@ const app = express();
 /* -------------------- CORS CONFIG -------------------- */
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174", // ✅ ADDED - Your frontend port
   "http://localhost:3000",
   "https://monday-clone-frontend.vercel.app",
   "https://monday-frontend-one.vercel.app",
